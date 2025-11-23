@@ -1,47 +1,20 @@
-// src/lib/supabase.ts
-// Guarded supabase client for frontend builds.
-// If VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are present, dynamically import and create the client.
-// Otherwise export a safe noop client with the minimal api shape used by the app.
+import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-type AnyObj = Record<string, any>;
-
-function noopResponse() {
-  return Promise.resolve({ data: null, error: null });
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables');
 }
 
-const noopFrom = (_table: string) => ({
-  select: async (_cols?: string) => noopResponse(),
-  insert: async (_payload?: AnyObj) => noopResponse(),
-  update: async (_payload?: AnyObj) => noopResponse(),
-  delete: async (_filter?: AnyObj) => noopResponse(),
-  maybeSingle: async () => noopResponse(),
-  single: async () => noopResponse(),
-  eq: function () { return this; },
-  order: function () { return this; }
-});
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-let supabaseClient: any = {
-  from: noopFrom
-};
-
-if (SUPABASE_URL && SUPABASE_KEY) {
-  // dynamic import so Vite will only include @supabase/supabase-js if env vars are present at build time
-  // Top-level await is supported by Vite
-  (async () => {
-    try {
-      const mod = await import('@supabase/supabase-js');
-      supabaseClient = mod.createClient(SUPABASE_URL, SUPABASE_KEY);
-      console.log('Supabase client initialized (frontend).');
-    } catch (err) {
-      console.warn('Failed to initialize supabase client:', err);
-      // keep noop client
-    }
-  })();
-} else {
-  console.info('Supabase not configured for frontend — using noop client.');
+export interface Link {
+  id: string;
+  code: string;
+  target_url: string;
+  click_count: number;
+  last_clicked_at: string | null;
+  created_at: string;
+  updated_at: string;
 }
-
-export default supabaseClient;
