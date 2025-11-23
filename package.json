@@ -4,13 +4,17 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "server": "tsx watch server/index.ts",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview",
-    "typecheck": "tsc --noEmit -p tsconfig.app.json"
-  },
+  "dev": "vite",
+  "server": "tsx watch server/index.ts",
+  "build": "vite build",
+  "lint": "eslint .",
+  "preview": "vite preview",
+  "typecheck": "tsc --noEmit -p tsconfig.app.json",
+  "build:server": "tsc -p .",
+  "start:server": "node dist/server/index.js",
+  "start": "npx tsx server/index.ts"
+}
+,
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",
     "cors": "^2.8.5",
